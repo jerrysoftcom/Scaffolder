@@ -1,0 +1,17 @@
+﻿@model <AppName>.Models.<TableName>
+@{
+    ViewBag.Title = "Title";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-controller="<TableName>" class="form-horizontal" role="form">
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="col-md-10">
+                <label asp-for="<ColumnName>" class="col-md-2 control-label"></label>
+                <span class="form-control">@Model.<ColumnName></span>
+            </div>
+        </div>
+    </div>
+</form>

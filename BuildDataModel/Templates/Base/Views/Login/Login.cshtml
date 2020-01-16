@@ -1,0 +1,18 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+    var returnUrl = Context.Request.Query["ReturnUrl"];
+}
+<link rel="stylesheet" href="~/css/Login-Form-Clean.css">
+
+<div class="login-clean">
+    <form method="post" asp-action="Login">
+        <input type="hidden" name="returnUrl" value="@returnUrl" />
+        <h2 class="sr-only">Login Form</h2>
+        <div class="illustration"><i class="icon ion-ios-navigate"></i></div>
+        <div class="form-group"><input class="form-control" type="email" name="email" placeholder="Email" /></div>
+        <div class="form-group"><input class="form-control" type="password" name="password" placeholder="Password" /></div>
+        <div class="form-group"><button class="btn btn-primary btn-block" type="submit" value="Signin">Log In</button></div>
+        <div class="forgot">@Html.ActionLink("Forgot your password?", "PasswordReset", "Login");</div>
+    </form>
+</div>

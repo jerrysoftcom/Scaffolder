@@ -1,0 +1,146 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<header>
+    <!-- Sidebar  -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <img alt="UtilityBilling" style="width:200px; " src="~/images/Logo.png" />
+        </div>
+        <ul class="list-unstyled components">
+            <li class="@ViewData["DashboardActive"]">
+                <a @(ViewData["Menu"])>
+                    <i class="fa fa-bar-chart"></i>
+                    Dashboard
+                </a>
+            </li>
+            <li class="@ViewData["WorkOrderActive"]">
+                <a href="#woSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-wrench"></i>
+                    Work Orders
+                </a>
+                @{ string activeClass = "";}
+                @if (ViewData["WorkOrderActive"] == null)
+                { activeClass = "collapse"; }
+                else
+                { activeClass = ""; }
+                <ul class="@activeClass list-unstyled" id="woSubmenu">
+                    <li>
+                        <a class="" asp-area="" asp-controller="Workorders" asp-action="Index">List</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Workorders" asp-action="Create">Add</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="">
+                <a href="#SubsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-wrench"></i>
+                    Subscribers
+                </a>
+                <ul class="list-unstyled" id="SubsSubmenu">
+                    <li>
+                        <a class="" asp-area="" asp-controller="Technicians" asp-action="Index">List</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Technicians" asp-action="Create">Add</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Users" asp-action="Index">List</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Users" asp-action="Create">Add</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Services" asp-action="Index">List</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Services" asp-action="Create">Add</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="@ViewData["AccountsActive"]">
+                <a href="#acctSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-address-card-o"></i>
+                    Accounts
+                </a>
+                @if (ViewData["AccountsActive"] == null)
+                { activeClass = "collapse"; }
+                else
+                { activeClass = ""; }
+                <ul class="@activeClass list-unstyled" id="acctSubmenu">
+                    <li>
+                        <a class="" asp-area="" asp-controller="Accounts" asp-action="Index">List</a>
+                    </li>
+                    <li>
+                        <a class="" asp-area="" asp-controller="Accounts" asp-action="Create">Add</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="@ViewData["AdminActive"]">
+                <a href="#adminSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-gears"></i>
+                    Admin
+                </a>
+                @if (ViewData["AdminActive"] == null)
+                { activeClass = "collapse"; }
+                else
+                { activeClass = ""; }
+                <ul class="@activeClass list-unstyled" id="adminSubmenu">
+                    <li class="@ViewData["AdminUsersActive"]">
+                        <a href="#adminUsersSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="fa fa-users"></i>
+                            Users
+                        </a>
+                        @if (ViewData["AdminUsersActive"] == null)
+                        { activeClass = "collapse"; }
+                        else
+                        { activeClass = ""; }
+                        <ul class="@activeClass list-unstyled" id="adminUsersSubmenu" style="padding:0 0 0 20px;">
+                            <li><a class="" asp-area="Identity" asp-page="/Account/Register">Add User</a></li>
+                            <li><a class="" asp-area="" asp-controller="Users" asp-action="Index">List Users</a></li>
+                            <li><a class="" asp-area="" asp-controller="UserRoles" asp-action="Index">List User Roles</a></li>
+                            <li><a class="" asp-area="" asp-controller="Roles" asp-action="Index">List Roles</a></li>
+                            <li><a class="" asp-area="" asp-controller="Roles" asp-action="Create">Add Roles</a></li>
+                        </ul>
+                    </li>
+                    <li class="@ViewData["AdminCodesActive"]">
+                        <a href="#adminCodesSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                            <i class="fa fa-sliders"></i>
+                            Codes
+                        </a>
+                        @if (ViewData["AdminUOMActive"] == null)
+                        { activeClass = "collapse"; }
+                        else
+                        { activeClass = ""; }
+                        <ul class="@activeClass list-unstyled" id="adminCodesSubmenu" style="padding:0 0 0 20px;">
+                            <li><a class="" asp-area="" asp-controller="StatusCodeWos" asp-action="Index">Status Codes</a></li>
+                            <li><a class="" asp-area="" asp-controller="UOM" asp-action="Index">Units</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="@ViewData["AdminActive"]">
+                <a href="#Subscribers" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-gears"></i>
+                    Subscribers
+                </a>
+                <ul class="@activeClass list-unstyled" id="Subscribers">
+                    <li class="@ViewData["AdminUsersActive"]">
+                    <li><a class="" asp-area="" asp-controller="Addresses" asp-action="Index"><i class="fa fa-users"></i>Addresses</a></li>
+                    <li><a class="" asp-area="" asp-controller="Users" asp-action="Index">Add</a></li>
+                </ul>
+            </li>
+            <li class="@ViewData["AdminCodesActive"]">
+                <a href="#adminCodesSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">
+                    <i class="fa fa-sliders"></i>
+                    Codes
+                </a>
+                <ul class="@activeClass list-unstyled" id="adminCodesSubmenu" style="padding:0 0 0 20px;">
+                    <li><a class="" asp-area="" asp-controller="StatusCodeWos" asp-action="Index">Status Codes</a></li>
+                    <li><a class="" asp-area="" asp-controller="UOM" asp-action="Index">Units</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</header>
