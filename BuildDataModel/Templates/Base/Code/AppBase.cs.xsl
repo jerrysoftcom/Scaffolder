@@ -279,7 +279,7 @@ namespace JS.Code
         {
             //System.Net.Mail
             MailAddress to = new MailAddress(email);
-            MailAddress from = new MailAddress("jeremiah@natisp.net.com");
+            MailAddress from = new MailAddress("jeremiah@jerrysoft.com");
             MailMessage message = new MailMessage(from, to);
             message.Subject = "Password Reset";
             message.Body = @"Click the link to reset your password <a href='" + url + "?resetEmail=" + email + "&resetKey=" + resetKey + "'>Click Here</a>";
@@ -289,7 +289,7 @@ namespace JS.Code
             message.IsBodyHtml = true;
             client.Host = "smtp.gmail.com"; //"mail.jerrysoft.com";
             client.Port = 587;
-            client.Credentials = new System.Net.NetworkCredential("jeremiah@natisp.net", "cnsfl1061");
+            client.Credentials = new System.Net.NetworkCredential("jeremiah@jerrysoft.com", "");
             client.EnableSsl = true;
             
             client.Send(message);
