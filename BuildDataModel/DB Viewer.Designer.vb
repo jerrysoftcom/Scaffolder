@@ -26,6 +26,9 @@ Partial Class DBViewer
         Me.tvSchema = New System.Windows.Forms.TreeView()
         Me.btLoadTables = New System.Windows.Forms.Button()
         Me.Panel1 = New System.Windows.Forms.Panel()
+        Me.btnTemplateFolder = New System.Windows.Forms.Button()
+        Me.tbFolder = New System.Windows.Forms.TextBox()
+        Me.lstServers = New System.Windows.Forms.TextBox()
         Me.tbPath = New System.Windows.Forms.TextBox()
         Me.SaveXml = New System.Windows.Forms.Button()
         Me.btnSelectAll = New System.Windows.Forms.Button()
@@ -48,7 +51,8 @@ Partial Class DBViewer
         Me.OpenToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.SaveToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ExitToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.lstServers = New System.Windows.Forms.TextBox()
+        Me.fbdTemplateFolder = New System.Windows.Forms.FolderBrowserDialog()
+        Me.btRebuild = New System.Windows.Forms.Button()
         Me.Panel1.SuspendLayout()
         CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
@@ -68,7 +72,7 @@ Partial Class DBViewer
         Me.lstDatabases.FormattingEnabled = True
         Me.lstDatabases.Location = New System.Drawing.Point(75, 96)
         Me.lstDatabases.Name = "lstDatabases"
-        Me.lstDatabases.Size = New System.Drawing.Size(157, 21)
+        Me.lstDatabases.Size = New System.Drawing.Size(170, 21)
         Me.lstDatabases.TabIndex = 3
         '
         'tvSchema
@@ -77,7 +81,7 @@ Partial Class DBViewer
         Me.tvSchema.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tvSchema.Location = New System.Drawing.Point(0, 0)
         Me.tvSchema.Name = "tvSchema"
-        Me.tvSchema.Size = New System.Drawing.Size(289, 429)
+        Me.tvSchema.Size = New System.Drawing.Size(278, 434)
         Me.tvSchema.TabIndex = 5
         '
         'btLoadTables
@@ -91,6 +95,9 @@ Partial Class DBViewer
         '
         'Panel1
         '
+        Me.Panel1.Controls.Add(Me.btRebuild)
+        Me.Panel1.Controls.Add(Me.btnTemplateFolder)
+        Me.Panel1.Controls.Add(Me.tbFolder)
         Me.Panel1.Controls.Add(Me.lstServers)
         Me.Panel1.Controls.Add(Me.tbPath)
         Me.Panel1.Controls.Add(Me.SaveXml)
@@ -108,39 +115,62 @@ Partial Class DBViewer
         Me.Panel1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel1.Location = New System.Drawing.Point(0, 0)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(289, 254)
+        Me.Panel1.Size = New System.Drawing.Size(278, 249)
         Me.Panel1.TabIndex = 7
+        '
+        'btnTemplateFolder
+        '
+        Me.btnTemplateFolder.Location = New System.Drawing.Point(210, 152)
+        Me.btnTemplateFolder.Name = "btnTemplateFolder"
+        Me.btnTemplateFolder.Size = New System.Drawing.Size(36, 23)
+        Me.btnTemplateFolder.TabIndex = 18
+        Me.btnTemplateFolder.Text = "..."
+        Me.btnTemplateFolder.UseVisualStyleBackColor = True
+        '
+        'tbFolder
+        '
+        Me.tbFolder.Location = New System.Drawing.Point(20, 152)
+        Me.tbFolder.Name = "tbFolder"
+        Me.tbFolder.Size = New System.Drawing.Size(184, 20)
+        Me.tbFolder.TabIndex = 17
+        '
+        'lstServers
+        '
+        Me.lstServers.Location = New System.Drawing.Point(75, 18)
+        Me.lstServers.Name = "lstServers"
+        Me.lstServers.Size = New System.Drawing.Size(170, 20)
+        Me.lstServers.TabIndex = 0
         '
         'tbPath
         '
-        Me.tbPath.Location = New System.Drawing.Point(20, 213)
+        Me.tbPath.Location = New System.Drawing.Point(19, 181)
         Me.tbPath.Name = "tbPath"
         Me.tbPath.Size = New System.Drawing.Size(226, 20)
         Me.tbPath.TabIndex = 16
         '
         'SaveXml
         '
-        Me.SaveXml.Location = New System.Drawing.Point(104, 183)
+        Me.SaveXml.Location = New System.Drawing.Point(86, 207)
         Me.SaveXml.Name = "SaveXml"
-        Me.SaveXml.Size = New System.Drawing.Size(75, 23)
+        Me.SaveXml.Size = New System.Drawing.Size(55, 23)
         Me.SaveXml.TabIndex = 15
         Me.SaveXml.Text = "SaveXml"
         Me.SaveXml.UseVisualStyleBackColor = True
         '
         'btnSelectAll
         '
-        Me.btnSelectAll.Location = New System.Drawing.Point(20, 183)
+        Me.btnSelectAll.Location = New System.Drawing.Point(20, 207)
         Me.btnSelectAll.Name = "btnSelectAll"
-        Me.btnSelectAll.Size = New System.Drawing.Size(78, 23)
+        Me.btnSelectAll.Size = New System.Drawing.Size(60, 23)
         Me.btnSelectAll.TabIndex = 14
         Me.btnSelectAll.Text = "Select All"
         Me.btnSelectAll.UseVisualStyleBackColor = True
         '
         'btBuild
         '
-        Me.btBuild.Location = New System.Drawing.Point(20, 154)
+        Me.btBuild.Location = New System.Drawing.Point(147, 208)
         Me.btBuild.Name = "btBuild"
-        Me.btBuild.Size = New System.Drawing.Size(78, 23)
+        Me.btBuild.Size = New System.Drawing.Size(41, 23)
         Me.btBuild.TabIndex = 6
         Me.btBuild.Text = "Build"
         Me.btBuild.UseVisualStyleBackColor = True
@@ -192,14 +222,14 @@ Partial Class DBViewer
         '
         Me.tbUserID.Location = New System.Drawing.Point(75, 42)
         Me.tbUserID.Name = "tbUserID"
-        Me.tbUserID.Size = New System.Drawing.Size(157, 20)
+        Me.tbUserID.Size = New System.Drawing.Size(170, 20)
         Me.tbUserID.TabIndex = 1
         '
         'tbPassword
         '
         Me.tbPassword.Location = New System.Drawing.Point(75, 68)
         Me.tbPassword.Name = "tbPassword"
-        Me.tbPassword.Size = New System.Drawing.Size(157, 20)
+        Me.tbPassword.Size = New System.Drawing.Size(170, 20)
         Me.tbPassword.TabIndex = 2
         '
         'SplitContainer1
@@ -218,7 +248,7 @@ Partial Class DBViewer
         '
         Me.SplitContainer1.Panel2.Controls.Add(Me.Panel2)
         Me.SplitContainer1.Size = New System.Drawing.Size(917, 687)
-        Me.SplitContainer1.SplitterDistance = 289
+        Me.SplitContainer1.SplitterDistance = 278
         Me.SplitContainer1.TabIndex = 8
         '
         'SplitContainer2
@@ -236,8 +266,8 @@ Partial Class DBViewer
         'SplitContainer2.Panel2
         '
         Me.SplitContainer2.Panel2.Controls.Add(Me.tvSchema)
-        Me.SplitContainer2.Size = New System.Drawing.Size(289, 687)
-        Me.SplitContainer2.SplitterDistance = 254
+        Me.SplitContainer2.Size = New System.Drawing.Size(278, 687)
+        Me.SplitContainer2.SplitterDistance = 249
         Me.SplitContainer2.TabIndex = 8
         '
         'Panel2
@@ -246,7 +276,7 @@ Partial Class DBViewer
         Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.Panel2.Location = New System.Drawing.Point(0, 0)
         Me.Panel2.Name = "Panel2"
-        Me.Panel2.Size = New System.Drawing.Size(624, 687)
+        Me.Panel2.Size = New System.Drawing.Size(635, 687)
         Me.Panel2.TabIndex = 9
         '
         'dgvColumns
@@ -255,7 +285,7 @@ Partial Class DBViewer
         Me.dgvColumns.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvColumns.Location = New System.Drawing.Point(0, 0)
         Me.dgvColumns.Name = "dgvColumns"
-        Me.dgvColumns.Size = New System.Drawing.Size(624, 687)
+        Me.dgvColumns.Size = New System.Drawing.Size(635, 687)
         Me.dgvColumns.TabIndex = 0
         '
         'fbdDALSave
@@ -303,12 +333,14 @@ Partial Class DBViewer
         Me.ExitToolStripMenuItem.Size = New System.Drawing.Size(103, 22)
         Me.ExitToolStripMenuItem.Text = "&Exit"
         '
-        'lstServers
+        'btRebuild
         '
-        Me.lstServers.Location = New System.Drawing.Point(75, 18)
-        Me.lstServers.Name = "lstServers"
-        Me.lstServers.Size = New System.Drawing.Size(157, 20)
-        Me.lstServers.TabIndex = 0
+        Me.btRebuild.Location = New System.Drawing.Point(194, 208)
+        Me.btRebuild.Name = "btRebuild"
+        Me.btRebuild.Size = New System.Drawing.Size(52, 23)
+        Me.btRebuild.TabIndex = 19
+        Me.btRebuild.Text = "ReBuild"
+        Me.btRebuild.UseVisualStyleBackColor = True
         '
         'DBViewer
         '
@@ -365,4 +397,8 @@ End Sub
     Friend WithEvents SaveXml As Button
     Friend WithEvents tbPath As TextBox
     Friend WithEvents lstServers As TextBox
+    Friend WithEvents btnTemplateFolder As Button
+    Friend WithEvents tbFolder As TextBox
+    Friend WithEvents fbdTemplateFolder As FolderBrowserDialog
+    Friend WithEvents btRebuild As Button
 End Class

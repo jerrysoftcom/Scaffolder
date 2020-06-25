@@ -10,10 +10,12 @@
     <xsl:text disable-output-escaping="yes"><![CDATA[
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Details ]]></xsl:text>
+<xsl:value-of select="EntityClassName"/>
+<xsl:text disable-output-escaping="yes"><![CDATA[";
 } 
 
-<h1>Details</h1>
+<h1>@ViewData["Title"]</h1>
 
 <div>
     <h4>]]></xsl:text>
@@ -51,8 +53,8 @@
 <div>
     <a asp-action="Edit" asp-route-id="@Model.]]></xsl:text>
           <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[" class="btn btn-primary btn-sm">Edit</a>
-    <a asp-action="Index">Back to List</a>
+          <xsl:text disable-output-escaping="yes"><![CDATA[" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i></a> 
+    <a asp-action="Index" class="btn btn-primary btn-sm"><i class="fas fa-list"></i></a>
 </div>]]></xsl:text>
         </xsl:when>
         <xsl:otherwise>

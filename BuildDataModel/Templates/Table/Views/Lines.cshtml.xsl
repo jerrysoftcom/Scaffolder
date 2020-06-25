@@ -7,17 +7,23 @@
     <xsl:text disable-output-escaping="yes"><![CDATA[.Models.]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[>
-
-<button type="button" id="add]]></xsl:text>
-<xsl:value-of select="EntityClassName"/>
-<xsl:text disable-output-escaping="yes"><![CDATA[" class="btn btn-primary" onclick="AjaxRunPlus('/]]></xsl:text>
-<xsl:value-of select="EntityClassName"/>
-<xsl:text disable-output-escaping="yes"><![CDATA[/Line','InvoiceitemsTbody', 'rec')">Add New</button>
-
 <table class="table">
     <thead>
         <tr>
-            <th></th>]]></xsl:text>
+            <th>
+                <button type="button" id="add]]></xsl:text>
+            <xsl:value-of select="EntityClassName"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[" class="btn btn-sm btn-primary" onclick="AjaxRunPlus('/]]></xsl:text>
+            <xsl:value-of select="EntityClassName"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[/Line',']]></xsl:text>
+            <xsl:value-of select="EntityClassName"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[Tbody', 'rec')"><i class="fas fa-plus"></i></button>
+            </th>
+]]></xsl:text>
+    <xsl:for-each select="ChildData[IsKey = 1]">
+      <xsl:text disable-output-escaping="yes"><![CDATA[            <th></th>]]></xsl:text>
+    </xsl:for-each>
+
     <xsl:for-each select="ChildData[IsKey = 0]">
       <xsl:sort select="OrdinalPosition" data-type="number"/>
       <xsl:text disable-output-escaping="yes"><![CDATA[

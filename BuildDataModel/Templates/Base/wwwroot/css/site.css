@@ -1,0 +1,27 @@
+﻿/*Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. 
+*/
+
+.container {
+    max-width: 100%;
+}
+
+.float-button {
+    position: fixed;
+    top: 100px;
+    right: 1rem;
+    color: #FFF;
+    border-radius: 50px;
+    text-align: center;
+}
+
+    .float-button ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .float-button li {
+        display: block;
+        padding: 2px 2px 2px;
+    }

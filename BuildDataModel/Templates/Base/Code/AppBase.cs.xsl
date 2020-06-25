@@ -15,66 +15,29 @@ using System.Net.Mail;
 using Microsoft.AspNetCore.Mvc.Routing;
 using ]]></xsl:text><xsl:value-of select="AppName"/><xsl:text disable-output-escaping="yes"><![CDATA[.Models;
 
-namespace JS.Code
+namespace ]]></xsl:text>
+<xsl:value-of select="AppName"/>
+<xsl:text disable-output-escaping="yes"><![CDATA[.Code
 
 {
-   public class Pager
+    public class GlobalVariables
     {
-        public void SetPages()
+        public static string SelectString = "Select";
+    }
+
+    public class ListPager
+    {
+        public ListPager() 
         {
-            MaxPage = (int)Math.Ceiling((decimal)(ItemCount / 10)) + 1;
-
-            if (CurrentPage == 0)
-            {
-                CurrentPage = 1;
-            }
-
-            PrevPage = CurrentPage - 1;
-            NextPage = CurrentPage + 1;
-
-            MaxSelect = CurrentPage + PagerRange;
-            MinSelect = CurrentPage - PagerRange;
-
-            for (int i = MinSelect; i < MaxSelect; i++)
-            {
-                if (i >= 1 && i <= MaxPage)
-                {
-                    Pages.Add(i);
-                }
-            }
-
-            if (CurrentPage == 1)
-            {
-                PrevPage = 1;
-                PreviousDisabled = "disabled";
-            }
-
-            if (CurrentPage == MaxPage)
-            {
-                MaxSelect = MaxPage;
-                NextPage = MaxPage;
-                NextDisabled = "disabled";
-            }
-
-            if (CurrentPage > MaxPage)
-            {
-                CurrentPage = MaxPage;
-            }
+            if (RecordsPerPage == 0) { RecordsPerPage = 10; }
+            if (PageNumber == 0) { PageNumber = 1; }
         }
-
-        public int MaxSelect = 0;
-        public int MinSelect = 0;
-
-        public int CurrentPage;
-        public int MaxPage;
-        public int ItemsPerPage = 10;
-        public int PagerRange = 3;
-        public List<int> Pages = new List<int>();
-        public int PrevPage;
-        public int NextPage;
-        public string PreviousDisabled = "";
-        public string NextDisabled = "";
-        public int ItemCount;
+       
+        public int PageNumber { get; set; }
+        public int RecordsPerPage { get; set; }
+        public int RecordCount { get; set; }
+        public int PageCount { get { return (int)Math.Ceiling((decimal)(RecordCount / (RecordsPerPage * 1.0))); } set { } }
+       
     }
 
     public class PasswordResetData
@@ -107,179 +70,13 @@ namespace JS.Code
         }
     }
 
-    public class MainMenu : ControllerBase
-    {
-        private readonly ]]></xsl:text><xsl:value-of select="ContextName"/><xsl:text disable-output-escaping="yes"><![CDATA[Context _context;
-        private MenuModelData _pvmd;
-        private bool _isAdmin;
-        private List<int> showList = new List<int>();
-
-        public MainMenu(]]></xsl:text><xsl:value-of select="ContextName"/><xsl:text disable-output-escaping="yes"><![CDATA[Context context, MenuModelData pvmd)
-        {
-            pvmd.PagePath = normalizePath(pvmd.PagePath);
-            _context = context;
-            _pvmd = pvmd;
-        }
-
-        private string normalizePath(string path)
-        {
-            if (path.ToLower().Contains("/edit/"))
-            {
-                path = path.Split("/Edit/")[0];
-            }
-            ///Details/
-            if (path.ToLower().Contains("/details/"))
-            {
-                path = path.Split("/Details/")[0];
-            }
-            return path;
-        }
-
-        private List<Menus> MenuItems(int parent)
-        {
-            var menus = _context.Menus
-                .Where(menu => menu.ParentMenuKey == parent && menu.Active == true && (menu.IsAdmin == false || menu.IsAdmin == _isAdmin))
-                .OrderBy(menu => menu.MenuLevel)
-                .ToList();
-            return menus;
-        }
-
-        private List<Menus> MainMenuItems()
-        {
-            //CableSubContext context = new CableSubContext();
-            var menus = _context.Menus
-                .Where(menu => menu.ParentMenuKey == null && menu.Active == true && (menu.IsAdmin == false || menu.IsAdmin == _isAdmin))
-                .OrderBy(menu => menu.MenuLevel)
-                .ToList();
-            return menus;
-        }
-
-        private string BuildMenuItem(string label, string url, string icon)
-        {
-            StringBuilder menuItem = new StringBuilder();
-            string adHref = "";
-            if (url.Length > 0)
-            {
-                adHref = $" href=\"{url}\"";
-            }
-            menuItem.AppendLine("<li>");
-            menuItem.AppendLine($"<a {adHref}>");
-            menuItem.AppendLine($"<i class=\"fa {icon}\"></i>");
-            menuItem.AppendLine($"{label}");
-            menuItem.AppendLine("</a>");
-            menuItem.AppendLine("</li>");
-
-            return menuItem.ToString();
-        }
-
-        private string GetSubMenus(int parentKey)
-        {
-            StringBuilder subMenu = new StringBuilder();
-            foreach (var row in MenuItems(parentKey))
-            {
-                if (MenuItems(row.MenuKey).Count() > 0)
-                {
-                    subMenu.AppendLine(MakeParentMenu(row.MenuKey, row.MenuId, row.MenuIcon));
-                }
-                else
-                {
-                    var url = row.MenuUrl;
-                    if (url == null) { url = ""; }
-                    subMenu.AppendLine(BuildMenuItem(row.MenuId, url, row.MenuIcon));
-                }
-            }
-
-            return subMenu.ToString();
-        }
-
-        private string MakeParentMenu(int parentKey, string label, string icon)
-        {
-            StringBuilder menuItem = new StringBuilder();
-            string hideClass = "collapse ";
-            string expanded = "false";
-            //if (_context.Menus.Where(e => e.MenuUrl == _pvmd.PagePath && e.ParentMenuKey == parentKey).Count() > 0)
-            foreach (int x in showList)
-            {
-                if (x == parentKey)
-                {
-                    hideClass = "";
-                    expanded = "true";
-                }
-            }
-
-            menuItem.AppendLine("<li>");
-            menuItem.AppendLine($"<a href=\"#Menu{parentKey}\" data-toggle=\"collapse\" aria-expanded=\"{expanded}\" class=\"dropdown-toggle\">");
-            menuItem.AppendLine($"<i class=\"fa {icon}\"></i>");
-            menuItem.AppendLine($"{label}");
-            menuItem.AppendLine("</a>");
-            menuItem.AppendLine($"<ul class=\"{hideClass}list-unstyled\" id=\"Menu{parentKey}\">");
-            // menuItem.AppendLine($"<ul class=\"collapse list-unstyled\" id=\"Menu{parentKey}\">");
-            menuItem.AppendLine(GetSubMenus(parentKey));
-            menuItem.AppendLine("</ul>");
-            menuItem.AppendLine("</li>");
-
-            return menuItem.ToString();
-        }
-
-        public string CreateMainMenu()
-        {
-            StringBuilder menu = new StringBuilder();
-            LoadShowList();
-
-            var usr = _pvmd.User;
-            if (usr != null)
-            {
-                _isAdmin = usr.IsInRole("Administrator");
-                //_isAdmin = true; //IsAdmin;
-                // menu.AppendLine(usr.Identity.Name);
-            }
-            menu.AppendLine("<ul class=\"list-unstyled components\">");
-            foreach (var row in MainMenuItems())
-            {
-                if (row.MenuUrl == null || row.MenuUrl.Length == 0)
-                {
-                    menu.AppendLine(MakeParentMenu(row.MenuKey, row.MenuId, row.MenuIcon));
-                }
-                else
-                {
-                    menu.AppendLine(BuildMenuItem(row.MenuId, row.MenuUrl, row.MenuIcon));
-                }
-            }
-            menu.AppendLine("</ul>");
-            return menu.ToString();
-        }
-
-        private void LoadShowList()
-        {
-            Menus menus = _context.Menus.Where(e => e.MenuUrl == _pvmd.PagePath).FirstOrDefault();
-            if (menus != null)
-            {
-                AddToShowList(menus.MenuKey);
-            }
-        }
-
-        private void AddToShowList(int menuKey)
-        {
-            showList.Add(menuKey);
-            Menus menus = _context.Menus.Where(e => e.MenuKey == menuKey).FirstOrDefault();
-            if (menus.ParentMenuKey != null)
-            {
-                AddToShowList((int)menus.ParentMenuKey);
-            }
-            else
-            {
-                showList.Add(menus.MenuKey);
-            }
-        }
-    }
-
     public class Tools
     {
         public void PasswordRecovery(string email, string resetKey, string url)
         {
             //System.Net.Mail
             MailAddress to = new MailAddress(email);
-            MailAddress from = new MailAddress("jeremiah@jerrysoft.com");
+            MailAddress from = new MailAddress("example@example.com");
             MailMessage message = new MailMessage(from, to);
             message.Subject = "Password Reset";
             message.Body = @"Click the link to reset your password <a href='" + url + "?resetEmail=" + email + "&resetKey=" + resetKey + "'>Click Here</a>";
@@ -287,10 +84,10 @@ namespace JS.Code
             // host, port, and credentials.
             SmtpClient client = new SmtpClient();
             message.IsBodyHtml = true;
-            client.Host = "smtp.gmail.com"; //"mail.jerrysoft.com";
-            client.Port = 587;
-            client.Credentials = new System.Net.NetworkCredential("jeremiah@jerrysoft.com", "");
-            client.EnableSsl = true;
+            client.Host = "smtp.mailserver.com";
+            client.Port = 25;
+            client.Credentials = new System.Net.NetworkCredential("example@example.com", "password");
+            client.EnableSsl = false;
             
             client.Send(message);
         }

@@ -2,6 +2,14 @@
 @{
     ViewData["Title"] = "Logout";
 }
-
-<h1>Logout</h1>
-
+<link rel="stylesheet" href="~/css/Highlight-Blue.css">
+<div class="highlight-blue">
+    <div class="container">
+        <div class="intro">
+            <h2 class="text-center">Logged Out</h2>
+        </div>
+    </div>
+</div>
+<script>
+    setTimeout(function () { location.href = '/Login'; }, 3000);
+</script>

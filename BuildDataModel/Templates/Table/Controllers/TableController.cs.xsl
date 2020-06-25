@@ -14,20 +14,12 @@
         <xsl:sort select="OrdinalPosition" data-type="number"/>
         <xsl:value-of select="EntityPropertyName"/>
       </xsl:for-each>
-      <xsl:for-each select="ChildData[IsKey = 1][2]">
-        <xsl:sort select="OrdinalPosition" data-type="number"/>,<xsl:value-of select="EntityPropertyName"/>
-      </xsl:for-each>
     </xsl:variable>
     <xsl:variable name="keyfieldswhere">
       <xsl:for-each select="ChildData[IsKey = 1][1]">
         <xsl:sort select="OrdinalPosition" data-type="number"/>
         <xsl:value-of select="EntityPropertyName"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[ == id && ]]></xsl:text>
-      </xsl:for-each>
-      <xsl:for-each select="ChildData[IsKey = 1][2]">
-        <xsl:sort select="OrdinalPosition" data-type="number"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[m.]]></xsl:text>
-        <xsl:value-of select="EntityPropertyName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[ == id]]></xsl:text>
       </xsl:for-each>
     </xsl:variable>
     <xsl:variable name="fields">
@@ -53,6 +45,9 @@ using Microsoft.EntityFrameworkCore;
 using ]]></xsl:text>
     <xsl:value-of select="AppName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[.Models;
+using ]]></xsl:text>
+    <xsl:value-of select="AppName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[.Code;
 
 namespace ]]></xsl:text>
     <xsl:value-of select="AppName"/>
@@ -65,6 +60,9 @@ namespace ]]></xsl:text>
         private readonly ]]></xsl:text>
     <xsl:value-of select="ContextName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Context _context;
+       private readonly ]]></xsl:text>
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[Business _business;
 
         public ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
@@ -73,16 +71,35 @@ namespace ]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[Context context)
         {
             _context = context;
+            _business = new ]]></xsl:text>
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[Business(_context);
         }
 
-        // GET: ]]></xsl:text>
+       // GET: ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[
         public async Task<IActionResult> Index()
         {
-            return View(await _context.]]></xsl:text>
+            ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.ToListAsync());
+    <xsl:text disable-output-escaping="yes"><![CDATA[Pager pgr = new ]]></xsl:text>
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[Pager
+            {
+                ObjList = await _business.ListAsync()
+            };
+
+            return View(pgr);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(]]></xsl:text>
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[Pager pgr)
+        {
+            pgr.ObjList = await _business.ListAsync();
+            return View(pgr);
         }
 
         // GET: ]]></xsl:text>
@@ -97,12 +114,9 @@ namespace ]]></xsl:text>
                 return NotFound();
             }
 
-            var record = await _context.]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[
-                .FirstOrDefaultAsync(m => m.]]></xsl:text>
-    <xsl:copy-of select="$keyfieldswhere" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[ == id);
+            var record = await _business.ReadAsync((]]></xsl:text>
+    <xsl:copy-of select="$keydatatype" />
+    <xsl:text disable-output-escaping="yes"><![CDATA[)id);
             if (record == null)
             {
                 return NotFound();
@@ -112,63 +126,25 @@ namespace ]]></xsl:text>
         }
 
         // GET: ]]></xsl:text>
-<xsl:value-of select="EntityClassName"/>
-<xsl:text disable-output-escaping="yes"><![CDATA[/Line/0
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[/Line/0
         public IActionResult Line(int id)
-        {]]></xsl:text>
-        <xsl:for-each select="ChildData">
-          <xsl:sort select="OrdinalPosition" data-type="number"/>
-          <xsl:choose>
-            <xsl:when test="IsFKey = 1">
-              <xsl:text disable-output-escaping="yes"><![CDATA[
-            ViewData["]]></xsl:text>
-              <xsl:value-of select="EntityPropertyName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA["] = new SelectList(_context.]]></xsl:text>
-              <xsl:value-of select="ReferenceTableName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-              <xsl:value-of select="ReferenceColumnName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-              <xsl:value-of select="ReferenceColumnName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[");]]></xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-        <xsl:text disable-output-escaping="yes"><![CDATA[
+        {
+            BuildSelectData(null);
             ViewData["detail]]></xsl:text>
-        <xsl:value-of select="EntityClassName"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[Recnum"] = id;
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[Recnum"] = id;
             return View(new ]]></xsl:text>
-        <xsl:value-of select="EntityClassName"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[());
+    <xsl:value-of select="EntityClassName"/>
+    <xsl:text disable-output-escaping="yes"><![CDATA[());
         }
 
         // GET: ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[/Create
         public IActionResult Create()
-        {]]></xsl:text>
-        <xsl:for-each select="ChildData">
-          <xsl:sort select="OrdinalPosition" data-type="number"/>
-          <xsl:choose>
-            <xsl:when test="IsFKey = 1">
-              <xsl:text disable-output-escaping="yes"><![CDATA[
-            ViewData["]]></xsl:text>
-              <xsl:value-of select="EntityPropertyName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA["] = new SelectList(_context.]]></xsl:text>
-              <xsl:value-of select="ReferenceTableName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-              <xsl:value-of select="ReferenceColumnName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-              <xsl:value-of select="ReferenceColumnName"/>
-              <xsl:text disable-output-escaping="yes"><![CDATA[");]]></xsl:text>
-            </xsl:when>
-            <xsl:otherwise>
-            </xsl:otherwise>
-          </xsl:choose>
-        </xsl:for-each>
-        <xsl:text disable-output-escaping="yes"><![CDATA[
+        {
+            BuildSelectData(null);
             return View();
         }
 
@@ -179,39 +155,17 @@ namespace ]]></xsl:text>
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind(]]></xsl:text>
-    <xsl:copy-of select="$fields" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[)] ]]></xsl:text>
+        public async Task<IActionResult> Create(]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[ record)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(record);
-                await _context.SaveChangesAsync();
+                await _business.CreateAsync(record);
                 return RedirectToAction(nameof(Index));
             }
-]]></xsl:text>
-            <xsl:for-each select="ChildData">
-              <xsl:sort select="OrdinalPosition" data-type="number"/>
-              <xsl:choose>
-                <xsl:when test="IsFKey = 1">
-                  <xsl:text disable-output-escaping="yes"><![CDATA[
-            ViewData["]]></xsl:text>
-                  <xsl:value-of select="EntityPropertyName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA["] = new SelectList(_context.]]></xsl:text>
-                  <xsl:value-of select="ReferenceTableName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-                  <xsl:value-of select="ReferenceColumnName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-                  <xsl:value-of select="ReferenceColumnName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[");]]></xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-            <xsl:text disable-output-escaping="yes"><![CDATA[
+
+            BuildSelectData(record);
             return View(record);
         }
 
@@ -227,39 +181,15 @@ namespace ]]></xsl:text>
                 return NotFound();
             }
 
-            var record = await _context.]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.FindAsync(id);
+            var record = await _business.ReadAsync((]]></xsl:text>
+    <xsl:copy-of select="$keydatatype" />
+    <xsl:text disable-output-escaping="yes"><![CDATA[)id);
             if (record == null)
             {
                 return NotFound();
             }
-            //Remove [ChangeToForeignTable] to Foreign Table value for Lines
-            //ViewData["detail[ChangeToForeignTable]Recnum"] = 0;
 
-]]></xsl:text>
-    <xsl:for-each select="ChildData">
-      <xsl:sort select="OrdinalPosition" data-type="number"/>
-      <xsl:choose>
-        <xsl:when test="IsFKey = 1">
-          <xsl:text disable-output-escaping="yes"><![CDATA[
-            ViewData["]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA["] = new SelectList(_context.]]></xsl:text>
-          <xsl:value-of select="ReferenceTableName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-          <xsl:value-of select="ReferenceColumnName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-          <xsl:value-of select="ReferenceColumnName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[", record.]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[);]]></xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
-    <xsl:text disable-output-escaping="yes"><![CDATA[
+            BuildSelectData(record);
             return View(record);
         }
 
@@ -270,9 +200,7 @@ namespace ]]></xsl:text>
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(]]></xsl:text>
     <xsl:copy-of select="$keydatatype" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[ id, [Bind(]]></xsl:text>
-    <xsl:copy-of select="$fields" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[)] ]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[ id, ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[ record)
         {
@@ -287,14 +215,13 @@ namespace ]]></xsl:text>
             {
                 try
                 {
-                    _context.Update(record);
-                    await _context.SaveChangesAsync();
+                    await _business.UpdateAsync(record);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[Exists(record.Id))
+                    if (!_business.RecordExsist(record.]]></xsl:text>
+    <xsl:copy-of select="$keyfields" />
+    <xsl:text disable-output-escaping="yes"><![CDATA[))
                     {
                         return NotFound();
                     }
@@ -306,29 +233,7 @@ namespace ]]></xsl:text>
                 return RedirectToAction(nameof(Index));
             }
         
-]]></xsl:text>
-            <xsl:for-each select="ChildData">
-              <xsl:sort select="OrdinalPosition" data-type="number"/>
-              <xsl:choose>
-                <xsl:when test="IsFKey = 1">
-                  <xsl:text disable-output-escaping="yes"><![CDATA[
-            ViewData["]]></xsl:text>
-                  <xsl:value-of select="EntityPropertyName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA["] = new SelectList(_context.]]></xsl:text>
-                  <xsl:value-of select="ReferenceTableName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-                  <xsl:value-of select="ReferenceColumnName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-                  <xsl:value-of select="ReferenceColumnName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[", record.]]></xsl:text>
-                  <xsl:value-of select="EntityPropertyName"/>
-                  <xsl:text disable-output-escaping="yes"><![CDATA[);]]></xsl:text>
-                </xsl:when>
-                <xsl:otherwise>
-                </xsl:otherwise>
-              </xsl:choose>
-            </xsl:for-each>
-            <xsl:text disable-output-escaping="yes"><![CDATA[
+            BuildSelectData(record);
             return View(record);
         }
 
@@ -344,12 +249,9 @@ namespace ]]></xsl:text>
                 return NotFound();
             }
 
-            var record = await _context.]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[
-                .FirstOrDefaultAsync(m => m.]]></xsl:text>
-    <xsl:copy-of select="$keyfieldswhere" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[ == id);
+            var record = await _business.ReadAsync((]]></xsl:text>
+    <xsl:copy-of select="$keydatatype" />
+    <xsl:text disable-output-escaping="yes"><![CDATA[)id);
             if (record == null)
             {
                 return NotFound();
@@ -367,27 +269,55 @@ namespace ]]></xsl:text>
     <xsl:copy-of select="$keydatatype" />
     <xsl:text disable-output-escaping="yes"><![CDATA[ id)
         {
-            var record = await _context.]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.FindAsync(id);
-            _context.]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.Remove(record);
-            await _context.SaveChangesAsync();
+            await _business.DeleteAsync((]]></xsl:text>
+    <xsl:copy-of select="$keydatatype" />
+    <xsl:text disable-output-escaping="yes"><![CDATA[)id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ]]></xsl:text>
+        private void BuildSelectData(]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[Exists(]]></xsl:text>
-    <xsl:copy-of select="$keydatatype" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[ id)
+    <xsl:text disable-output-escaping="yes"><![CDATA[ record)
         {
-            return _context.]]></xsl:text>
+            string SelectText = GlobalVariables.SelectString;
+
+            if (record == null)
+            {
+                record = new ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.Any(m => m.]]></xsl:text>
-    <xsl:copy-of select="$keyfieldswhere" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[ == id);
+    <xsl:text disable-output-escaping="yes"><![CDATA[();
+            }]]></xsl:text>
+    <xsl:for-each select="ChildData">
+      <xsl:sort select="OrdinalPosition" data-type="number"/>
+      <xsl:choose>
+        <xsl:when test="IsFKey = 1">
+          <xsl:text disable-output-escaping="yes"><![CDATA[
+
+            var ]]></xsl:text>
+          <xsl:value-of select="EntityPropertyName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[ = new SelectList(_context.]]></xsl:text>
+          <xsl:value-of select="ReferenceTableName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
+          <xsl:value-of select="ReferenceColumnName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
+          <xsl:value-of select="ReferenceColumnName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[", record.]]></xsl:text>
+          <xsl:value-of select="EntityPropertyName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[).ToList();
+            ]]></xsl:text>
+          <xsl:value-of select="EntityPropertyName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[.Insert(0, new SelectListItem { Value = "", Text = SelectText });
+            ViewData["]]></xsl:text>
+          <xsl:value-of select="EntityPropertyName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA["] = ]]></xsl:text>
+          <xsl:value-of select="EntityPropertyName"/>
+          <xsl:text disable-output-escaping="yes"><![CDATA[;]]></xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:for-each>
+    <xsl:text disable-output-escaping="yes"><![CDATA[
         }
     }
 }]]></xsl:text>

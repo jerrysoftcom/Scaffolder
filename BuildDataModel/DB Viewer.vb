@@ -2,7 +2,7 @@
 Imports Microsoft.SqlServer.Management.Common
 Imports System.IO
 Public Class DBViewer
-    Private Sub lstServers_TextChanged(sender As Object, e As EventArgs) Handles lstServers.TextChanged
+    Private Sub LstServers_TextChanged(sender As Object, e As EventArgs) Handles lstServers.TextChanged
         FillDatabases()
     End Sub
 
@@ -30,22 +30,23 @@ Public Class DBViewer
         End Try
         'End If
     End Sub
-    Private Function getDa() As DA
-        Dim da As New DA
-        da.Database = lstDatabases.Text
-        da.Server = lstServers.Text
-        da.UserID = tbUserID.Text
-        da.Password = tbPassword.Text
-        da.AppName = tbAppName.Text
+    Private Function GetDa() As DA
+        Dim da As New DA With {
+            .Database = lstDatabases.Text,
+            .Server = lstServers.Text,
+            .UserID = tbUserID.Text,
+            .Password = tbPassword.Text,
+            .AppName = tbAppName.Text
+        }
 
         Return da
     End Function
-    Private Sub btLoadTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btLoadTables.Click
+    Private Sub BtLoadTables_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btLoadTables.Click
         Try
             tvSchema.Nodes.Clear()
-            '_TableData = New List(Of DataTable)
+
             Dim dt As New Data.DataTable
-            Dim da As DA = getDa()
+            Dim da As DA = GetDa()
 
             dt = da.getTables
             Dim refreshCnt As Integer = 0
@@ -62,43 +63,41 @@ Public Class DBViewer
             Me.tbAppName.Text = Me.lstDatabases.Text
         End If
     End Sub
-    Private Sub tvSchema_AfterSelect(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvSchema.AfterSelect
-        Dim da As DA = getDa()
+    Private Sub TvSchema_AfterSelect(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvSchema.AfterSelect
+        Dim da As DA = GetDa()
         Dim ddt As DataTable = da.getTableSchema(tvSchema.SelectedNode.Text)
 
         dgvColumns.DataSource = ddt
 
     End Sub
-    Private Sub lstDatabases_DropDown(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDatabases.DropDown
+    Private Sub LstDatabases_DropDown(ByVal sender As Object, ByVal e As System.EventArgs) Handles lstDatabases.DropDown
         If lstDatabases.Items.Count < 1 Then
             FillDatabases()
         End If
     End Sub
-    Private Sub btBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btBuild.Click
+    Private Sub BtBuild_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btBuild.Click
 
         fbdDALSave.SelectedPath = tbPath.Text
         If fbdDALSave.ShowDialog = Windows.Forms.DialogResult.OK Then
             Dim path As String = fbdDALSave.SelectedPath
-            'If Microsoft.VisualBasic.Right(path, 1) <> "\" Then
-            '    path += "\"
-            'End If
-            '        _outputFolder = value
 
             For Each nd As TreeNode In tvSchema.Nodes
                 If nd.Checked Then
-                    Dim da As DA = getDa()
+                    Dim da As DA = GetDa()
                     Dim ds As New DataSet()
                     da.OutputFolder = path
-                    da.ProcessXsl(nd.Text)
-                    'ds = da.getTableSchemaDataset(nd.Text)
-                    'ds.WriteXml(fbdDALSave.SelectedPath + "\" + nd.Text + ".xml", XmlWriteMode.IgnoreSchema)
+                    If tbFolder.Text.Length > 0 Then
+                        da.ProcessXsl(nd.Text, tbFolder.Text)
+                    Else
+                        da.ProcessXsl(nd.Text)
+                    End If
                 End If
             Next
             MsgBox("Complete")
             tbPath.Text = fbdDALSave.SelectedPath
         End If
     End Sub
-    Private Sub btnSelectAll_Click(sender As Object, e As EventArgs) Handles btnSelectAll.Click
+    Private Sub BtnSelectAll_Click(sender As Object, e As EventArgs) Handles btnSelectAll.Click
         For Each nd As TreeNode In tvSchema.Nodes
             nd.Checked = True
         Next
@@ -110,10 +109,10 @@ Public Class DBViewer
 
             For Each nd As TreeNode In tvSchema.Nodes
                 If nd.Checked Then
-                    Dim da As DA = getDa()
-                    Dim ds As New DataSet()
+                    Dim da As DA = GetDa()
+                    Dim unused As New DataSet()
 
-                    ds = da.getTableSchemaDataset(nd.Text)
+                    Dim ds As DataSet = da.getTableSchemaDataset(nd.Text)
                     ds.WriteXml(fbdDALSave.SelectedPath + "\" + nd.Text + ".xml", XmlWriteMode.IgnoreSchema)
                     MsgBox("Complete", "Build")
                 End If
@@ -159,4 +158,33 @@ Public Class DBViewer
         tbPath.Text = Application.StartupPath
     End Sub
 
+    Private Sub BtnTemplateFolder_Click(sender As Object, e As EventArgs) Handles btnTemplateFolder.Click
+        If fbdTemplateFolder.ShowDialog = DialogResult.OK Then
+            tbFolder.Text = fbdTemplateFolder.SelectedPath
+        End If
+    End Sub
+
+    Private Sub BtRebuild_Click(sender As Object, e As EventArgs) Handles btRebuild.Click
+
+        fbdDALSave.SelectedPath = tbPath.Text
+        If fbdDALSave.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Dim path As String = fbdDALSave.SelectedPath
+
+            For Each nd As TreeNode In tvSchema.Nodes
+                If nd.Checked Then
+                    Dim da As DA = GetDa()
+                    Dim ds As New DataSet()
+                    da.OutputFolder = path
+                    If tbFolder.Text.Length > 0 Then
+                        da.ProcessXsl(nd.Text, tbFolder.Text)
+                    Else
+                        da.ProcessXsl(nd.Text)
+                    End If
+
+                End If
+            Next
+            MsgBox("Complete")
+            tbPath.Text = fbdDALSave.SelectedPath
+        End If
+    End Sub
 End Class

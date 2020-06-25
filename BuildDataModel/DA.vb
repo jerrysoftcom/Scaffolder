@@ -33,7 +33,15 @@ Public Class DA
         dtPar.TableName = "ParentData"
         ds.Tables.Add(dtPar)
 
+        Dim fkText = "select EntityClassName, UPPER(LEFT(FKeyEntityName,1))+LOWER(SUBSTRING(FKeyEntityName,2,LEN(FKeyEntityName))) AS FKeyEntityName from ("
+        Dim FKquery = fkText + query.Replace("DISTINCT", "DISTINCT KEYTABLE.TableName As FKeyEntityName, ") + ") As FKeysTable where FKeyEntityName is not null"
+        Dim dtFKeys As DataTable = getData(FKquery).Tables(0).Copy
+        dtFKeys.TableName = "FKeys"
+        ds.Tables.Add(dtFKeys)
+
         ds.Tables(0).ParentRelations.Add(ds.Tables(1).Columns(1), ds.Tables(0).Columns(0)).Nested = True
+        ds.Tables(2).ParentRelations.Add(ds.Tables(1).Columns(1), ds.Tables(2).Columns(0)).Nested = True
+
         ds.DataSetName = "Entitybase"
 
         Return ds
@@ -57,18 +65,18 @@ Public Class DA
         For Each row In dt.Rows
             Dim dataType As String = row(7).ToString().ToLower
             'If dataType.Contains("char") Then
-            '    dataType = "string"
+            '    dataType = "String"
             'End If
             Select Case dataType
                 Case "bigint", "int", "smallint", "tinyint"
                     dataType = "int"
-                Case "decimal", "float", "money", "numeric", "real", "smallmoney"
-                    dataType = "decimal"
+                Case "Decimal", "float", "money", "numeric", "real", "smallmoney"
+                    dataType = "Decimal"
                 Case "binary", "image", "varbinary", "timestamp"
-                    dataType = "byte[]"
+                    dataType = "Byte[]"
                 Case "char", "nchar", "ntext", "nvarchar", "text", "varchar"
-                    dataType = "string"
-                Case "date", "datetime", "datetime2", "datetimeoffset", "smalldatetime", "time"
+                    dataType = "String"
+                Case "Date", "datetime", "datetime2", "datetimeoffset", "smalldatetime", "time"
                     dataType = "DateTime"
                 Case "bit"
                     dataType = "bool"
@@ -78,7 +86,7 @@ Public Class DA
     End Sub
     Public Function getTableSchema(ByVal tableName As String) As DataTable
         Dim dt As New DataTable
-        Dim query As String = queryForTableStructure() & " AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
+        Dim query As String = queryForTableStructure() & " And INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
         dt = getData(query).Tables(0)
         'UpcaseTable(dt)
         ConvertDataType(dt)
@@ -220,16 +228,20 @@ Public Class DA
     End Function
 
     Public Sub ProcessXsl(DbTable As String)
+        Dim Folder As String = Application.StartupPath + "\Templates"
+
+        ProcessXsl(DbTable, Folder)
+    End Sub
+    Public Sub ProcessXsl(DbTable As String, Folder As String)
         Dim DataSchema As DataSet
         DataSchema = getTableSchemaDataset(DbTable)
         ConvertDataType(DataSchema.Tables(0))
         Dim TempPath As String = System.IO.Path.GetTempFileName.Replace(".tmp", ".xml")
         DataSchema.WriteXml(TempPath, XmlWriteMode.IgnoreSchema)
         DbTable = camelBack(DbTable)
-        Dim Path = Application.StartupPath
         Dim xslt As New XslCompiledTransform()
         'Process Base Template Files
-        For Each baseDir As String In Directory.GetDirectories(Path + "\Templates\Base")
+        For Each baseDir As String In Directory.GetDirectories($"{Folder}\Base")
             For Each xfile As String In Directory.GetFiles(baseDir)
                 Dim cpy As Boolean = True
                 If xfile.Contains(".xsl") Then
@@ -237,7 +249,7 @@ Public Class DA
                     xslt.Load(xfile)
                 End If
                 Dim fileout = xfile.Replace(baseDir, "").Replace(".xsl", "")
-                Dim folderOut = OutputFolder + baseDir.Replace(Path + "\Templates\Base", "")
+                Dim folderOut = OutputFolder + baseDir.Replace($"{Folder}\Base", "")
 
                 If Not IO.Directory.Exists($"{folderOut}\{DbTable}") Then
                     Directory.CreateDirectory($"{folderOut}\{DbTable}")
@@ -249,7 +261,7 @@ Public Class DA
                 End If
             Next
         Next
-        For Each tableDir As String In Directory.GetDirectories(Path + "\Templates\Table")
+        For Each tableDir As String In Directory.GetDirectories($"{Folder}\Table")
             For Each xfile As String In Directory.GetFiles(tableDir)
                 Dim cpy As Boolean = True
                 If xfile.Contains(".xsl") Then
@@ -257,7 +269,7 @@ Public Class DA
                     xslt.Load(xfile)
                 End If
                 Dim fileout = xfile.Replace(tableDir, "").Replace(".xsl", "").Replace("Table", camelBack(DbTable))
-                Dim folderOut = OutputFolder + tableDir.Replace(Path + "\Templates\Table", "")
+                Dim folderOut = OutputFolder + tableDir.Replace($"{Folder}\Table", "")
                 If Not IO.Directory.Exists($"{folderOut}\{DbTable}") Then
                     Directory.CreateDirectory($"{folderOut}\{DbTable}")
                 End If
@@ -270,7 +282,5 @@ Public Class DA
         Next
         System.IO.File.Delete(TempPath)
     End Sub
-    Private Sub ProcessFolder(PathToProcess As String)
 
-    End Sub
 End Class

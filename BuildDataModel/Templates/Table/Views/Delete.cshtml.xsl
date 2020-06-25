@@ -13,7 +13,7 @@
     ViewData["Title"] = "Delete";
 } 
 
-<h1>Delete</h1>
+<h1>@ViewData["Title"]</h1>
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
@@ -53,8 +53,8 @@
         <input type="hidden" asp-for="]]></xsl:text>
           <xsl:value-of select="EntityPropertyName"/>
           <xsl:text disable-output-escaping="yes"><![CDATA[" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <button type="submit" class="btn btn-danger"><i class="fas fa-remove"></i></button> |
+        <a asp-action="Index"><i class="fas fa-list"></i></a>
     </form>
 </div>]]></xsl:text>
         </xsl:when>

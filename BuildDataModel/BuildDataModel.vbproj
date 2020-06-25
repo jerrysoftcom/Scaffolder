@@ -256,6 +256,11 @@
     <Content Include="Templates\Base\Controllers\LoginController.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\Base\wwwroot\css\Highlight-Blue.css" />
+    <Content Include="Templates\Base\wwwroot\css\Login-Form-Clean.css" />
+    <Content Include="Templates\Base\wwwroot\css\Navigation-with-Button.css" />
+    <Content Include="Templates\Base\wwwroot\css\sidebar_style.css" />
+    <Content Include="Templates\Base\wwwroot\css\site.css" />
     <Content Include="Templates\Table\Code\TableBusiness.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -277,16 +282,22 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Templates\Table\Views\Form.cshtml.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Templates\Table\Views\Index.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\Table\Views\Line.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Templates\Table\Views\Lines.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -15,7 +15,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Http;
-using JS.Code;
+using ]]></xsl:text>
+<xsl:value-of select="AppName"/>
+<xsl:text disable-output-escaping="yes"><![CDATA[.Code;
 using ]]></xsl:text><xsl:value-of select="AppName"/><xsl:text disable-output-escaping="yes"><![CDATA[.Models;
 
 namespace ]]></xsl:text><xsl:value-of select="AppName"/><xsl:text disable-output-escaping="yes"><![CDATA[.Controllers
