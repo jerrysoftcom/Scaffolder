@@ -12,6 +12,19 @@
     int rec = (int)(ViewBag.]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Recnum ?? 0);
+]]></xsl:text>
+    <xsl:for-each select="ChildData[IsFKey = 1]">
+      <xsl:text disable-output-escaping="yes"><![CDATA[
+    ViewBag.]]></xsl:text>
+      <xsl:value-of select="EntityPropertyName"/>
+      <xsl:text disable-output-escaping="yes"><![CDATA[ = new SelectList(ViewBag.]]></xsl:text>
+      <xsl:value-of select="EntityPropertyName"/>
+      <xsl:text disable-output-escaping="yes"><![CDATA[, "Value", "Text", Model.]]></xsl:text>
+      <xsl:value-of select="EntityPropertyName"/>
+      <xsl:text disable-output-escaping="yes"><![CDATA[).ToList();
+]]></xsl:text>
+    </xsl:for-each>
+      <xsl:text disable-output-escaping="yes"><![CDATA[
 }
 <tr>
 	<td>
@@ -35,13 +48,21 @@
     <xsl:text disable-output-escaping="yes"><![CDATA[<td>]]></xsl:text>
     <xsl:choose>
       <xsl:when test="IsFKey = 1">
-        <xsl:text disable-output-escaping="yes"><![CDATA[<select asp-for="]]></xsl:text>
+        <xsl:text disable-output-escaping="yes"><![CDATA[
+		<select id="]]></xsl:text>
+        <xsl:value-of select="EntityClassName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[[@rec].]]></xsl:text>
+        <xsl:value-of select="EntityPropertyName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[" name="]]></xsl:text>
+        <xsl:value-of select="EntityClassName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[[@rec].]]></xsl:text>
         <xsl:value-of select="EntityPropertyName"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[" class="form-control" asp-items="ViewBag.]]></xsl:text>
         <xsl:value-of select="EntityPropertyName"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[" placeholder="@Html.DisplayNameFor(model => model.]]></xsl:text>
         <xsl:value-of select="EntityPropertyName"/>
-        <xsl:text disable-output-escaping="yes"><![CDATA[)"></select>]]></xsl:text>
+        <xsl:text disable-output-escaping="yes"><![CDATA[)"></select>
+]]></xsl:text>
       </xsl:when>
       <xsl:otherwise>
         <xsl:choose>

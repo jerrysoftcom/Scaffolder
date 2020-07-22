@@ -15,11 +15,6 @@
 } 
 
 <h4>@ViewData["Title"]</h4>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i></a>
-</p>
-
 <form method="post" id="Pager">
     @{
         await Html.RenderPartialAsync("..//shared//Pager.cshtml", (]]></xsl:text>
@@ -30,9 +25,13 @@
 <table class="table table-striped table-responsive" style="white-space:nowrap; padding: 0 0 0 0;">
     <thead>
         <tr>
-            <th></th>
-            <th></th>
-            <th></th>]]></xsl:text>
+            <th>
+                <a asp-action="Create" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i></a>
+            </th>
+            <th>
+            </th>
+            <th>
+            </th>]]></xsl:text>
     <xsl:for-each select="ChildData[IsKey = 0]">
       <xsl:sort select="OrdinalPosition" data-type="number"/>
       <xsl:text disable-output-escaping="yes"><![CDATA[

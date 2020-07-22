@@ -2,8 +2,7 @@
   <xsl:strip-space elements="*"/>
   <xsl:output omit-xml-declaration="yes" indent="no"/>
   <xsl:template match="ParentData">
-    <xsl:text disable-output-escaping="yes"><![CDATA[
-@model ]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[@model ]]></xsl:text>
     <xsl:value-of select="AppName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[.Models.]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>

@@ -55,8 +55,7 @@
         <xsl:text disable-output-escaping="yes"><![CDATA[ ?? false, new { Class = "" })]]></xsl:text>
       </xsl:when>
       <xsl:otherwise>
-        <xsl:text disable-output-escaping="yes"><![CDATA[
-                        <input asp-for="]]></xsl:text>
+        <xsl:text disable-output-escaping="yes"><![CDATA[<input asp-for="]]></xsl:text>
         <xsl:value-of select="EntityPropertyName"/>
         <xsl:text disable-output-escaping="yes"><![CDATA[" class="form-control" placeholder="@Html.DisplayNameFor(model => model.]]></xsl:text>
         <xsl:value-of select="EntityPropertyName"/>

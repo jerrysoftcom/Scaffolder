@@ -263,10 +263,19 @@
     <Content Include="Templates\Base\wwwroot\css\site.css" />
     <Content Include="Templates\Table\Code\TableBusiness.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Templates\Table\Controllers\TableApiController.cs.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Templates\Table\Controllers\TableController.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Templates\Table\Models\TableModelExtensions.cs.xsl">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\Table\Views\Create.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -277,6 +286,7 @@
     </Content>
     <Content Include="Templates\Table\Views\Details.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Templates\Table\Views\Edit.cshtml.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

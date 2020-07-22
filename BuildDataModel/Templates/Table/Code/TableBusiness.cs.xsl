@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using ]]></xsl:text>
     <xsl:value-of select="AppName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[.Models;
@@ -44,6 +45,54 @@ namespace ]]></xsl:text>
             _context = context;
         }
 
+        public List<KeyValuePair<string,object>> BuildSelectData(]]></xsl:text>
+<xsl:value-of select="EntityClassName"/>
+<xsl:text disable-output-escaping="yes"><![CDATA[ record)
+        {
+            List<KeyValuePair<string, object>> ViewData = new List<KeyValuePair<string,object>>();
+
+            string SelectText = GlobalVariables.SelectString;
+
+            if (record == null)
+            {
+                record = new ]]></xsl:text>
+            <xsl:value-of select="EntityClassName"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[();
+            }]]></xsl:text>
+            <xsl:for-each select="ChildData">
+              <xsl:sort select="OrdinalPosition" data-type="number"/>
+              <xsl:choose>
+                <xsl:when test="IsFKey = 1">
+                  <xsl:text disable-output-escaping="yes"><![CDATA[
+
+            var ]]></xsl:text>
+                  <xsl:value-of select="EntityPropertyName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[ = new SelectList(_context.]]></xsl:text>
+                  <xsl:value-of select="ReferenceTableName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
+                  <xsl:value-of select="ReferenceColumnName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
+                  <xsl:value-of select="ReferenceColumnName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[", record.]]></xsl:text>
+                  <xsl:value-of select="EntityPropertyName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[).ToList();
+            ]]></xsl:text>
+                  <xsl:value-of select="EntityPropertyName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[.Insert(0, new SelectListItem { Value = "", Text = SelectText });
+            ViewData.Add(new KeyValuePair<string, object> ("]]></xsl:text>
+                  <xsl:value-of select="EntityPropertyName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[", ]]></xsl:text>
+                  <xsl:value-of select="EntityPropertyName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[));]]></xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:for-each>
+            <xsl:text disable-output-escaping="yes"><![CDATA[
+            return ViewData;
+        }
+
         // List
         public List<]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
@@ -53,7 +102,8 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:apply-templates select="FKeys">
     </xsl:apply-templates>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.ToList();
+    <xsl:text disable-output-escaping="yes"><![CDATA[
+                .ToList();
             return records;
         }
         public async Task<List<]]></xsl:text>
@@ -64,7 +114,8 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:apply-templates select="FKeys">
     </xsl:apply-templates>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.ToListAsync();
+    <xsl:text disable-output-escaping="yes"><![CDATA[
+                .ToListAsync();
             return records;
         }
         // Create
@@ -107,7 +158,8 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:apply-templates select="FKeys">
     </xsl:apply-templates>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.FirstOrDefault(m => m.]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[
+                .FirstOrDefault(m => m.]]></xsl:text>
     <xsl:copy-of select="$keyfields" />
     <xsl:text disable-output-escaping="yes"><![CDATA[ == id);
             return record;
@@ -122,7 +174,8 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:apply-templates select="FKeys">
     </xsl:apply-templates>
-    <xsl:text disable-output-escaping="yes"><![CDATA[.FirstOrDefaultAsync(m => m.]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[
+                .FirstOrDefaultAsync(m => m.]]></xsl:text>
     <xsl:copy-of select="$keyfields" />
     <xsl:text disable-output-escaping="yes"><![CDATA[ == id);
             return record;
@@ -213,7 +266,8 @@ namespace ]]></xsl:text>
 }]]></xsl:text>
   </xsl:template>
   <xsl:template match="FKeys">
-    <xsl:text disable-output-escaping="yes"><![CDATA[.Include(e => e.]]></xsl:text>
+    <xsl:text disable-output-escaping="yes"><![CDATA[
+                .Include(e => e.]]></xsl:text>
     <xsl:value-of select="FKeyEntityName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[)]]></xsl:text>
   </xsl:template>

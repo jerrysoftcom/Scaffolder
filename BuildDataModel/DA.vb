@@ -15,17 +15,17 @@ Public Class DA
     Public Property OutputFolder() As String
     Public Property AppName As String
 
-    Private listToContext As New List(Of String)
-    Public Function getTables() As DataTable
+    Private ReadOnly listToContext As New List(Of String)
+    Public Function GetTables() As DataTable
         Dim Query As String
         Query = "select name from sysobjects where xtype in ('u','v') "
         Query += " ORDER BY name"
-        Return getData(Query).Tables(0)
+        Return GetData(Query).Tables(0)
     End Function
-    Public Function getTableSchemaDataset(ByVal tableName As String) As DataSet
-        Dim ds As New DataSet("ParentData")
-        Dim query As String = queryForTableStructureNoFkeys() & " AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
-        ds = getData(query)
+    Public Function GetTableSchemaDataset(ByVal tableName As String) As DataSet
+        Dim ds As DataSet '("ParentData")
+        Dim query As String = QueryForTableStructureNoFkeys() & " AND INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
+        ds = GetData(query)
         'UpcaseTable(ds.Tables(0))
         ds.Tables(0).TableName = "ChildData"
 
@@ -35,7 +35,7 @@ Public Class DA
 
         Dim fkText = "select EntityClassName, UPPER(LEFT(FKeyEntityName,1))+LOWER(SUBSTRING(FKeyEntityName,2,LEN(FKeyEntityName))) AS FKeyEntityName from ("
         Dim FKquery = fkText + query.Replace("DISTINCT", "DISTINCT KEYTABLE.TableName As FKeyEntityName, ") + ") As FKeysTable where FKeyEntityName is not null"
-        Dim dtFKeys As DataTable = getData(FKquery).Tables(0).Copy
+        Dim dtFKeys As DataTable = GetData(FKquery).Tables(0).Copy
         dtFKeys.TableName = "FKeys"
         ds.Tables.Add(dtFKeys)
 
@@ -71,11 +71,11 @@ Public Class DA
                 Case "bigint", "int", "smallint", "tinyint"
                     dataType = "int"
                 Case "Decimal", "float", "money", "numeric", "real", "smallmoney"
-                    dataType = "Decimal"
+                    dataType = "decimal"
                 Case "binary", "image", "varbinary", "timestamp"
-                    dataType = "Byte[]"
+                    dataType = "byte[]"
                 Case "char", "nchar", "ntext", "nvarchar", "text", "varchar"
-                    dataType = "String"
+                    dataType = "string"
                 Case "Date", "datetime", "datetime2", "datetimeoffset", "smalldatetime", "time"
                     dataType = "DateTime"
                 Case "bit"
@@ -84,10 +84,10 @@ Public Class DA
             row(7) = dataType
         Next
     End Sub
-    Public Function getTableSchema(ByVal tableName As String) As DataTable
-        Dim dt As New DataTable
-        Dim query As String = queryForTableStructure() & " And INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
-        dt = getData(query).Tables(0)
+    Public Function GetTableSchema(ByVal tableName As String) As DataTable
+        Dim dt As DataTable
+        Dim query As String = QueryForTableStructure() & " And INFORMATION_SCHEMA.COLUMNS.TABLE_NAME ='" & tableName & "'"
+        dt = GetData(query).Tables(0)
         'UpcaseTable(dt)
         ConvertDataType(dt)
         Return dt
@@ -111,20 +111,20 @@ Public Class DA
         dt.Rows.Add(row)
         Return dt
     End Function
-    Private Function getConnString() As String
+    Private Function GetConnString() As String
         Dim conn As String
         conn = "Data Source=" & _Server & ";Initial Catalog=" & _Database & ";Persist Security Info=True;User ID=" & _UserID & ";Password=" & _Password & ";" 'Max Pool Size=100;"
         Return conn
     End Function
-    Private Function getData(ByVal Query As String) As DataSet
-        Dim conn As New SqlConnection(getConnString)
+    Private Function GetData(ByVal Query As String) As DataSet
+        Dim conn As New SqlConnection(GetConnString)
         Dim sda As New SqlDataAdapter(Query, conn)
         Dim ds As New DataSet
         sda.Fill(ds)
         conn.Dispose()
         Return ds
     End Function
-    Private Function queryForTableStructure() As String
+    Private Function QueryForTableStructure() As String
 
         Dim queryStruct As String = ""
         queryStruct += "SELECT DISTINCT " 'INFORMATION_SCHEMA.COLUMNS.TABLE_NAME AS EntityClassName, INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME AS EntityPropertyName, "
@@ -172,7 +172,7 @@ Public Class DA
         Return queryStruct
 
     End Function
-    Private Function queryForTableStructureNoFkeys() As String
+    Private Function QueryForTableStructureNoFkeys() As String
         Dim Query As New StringBuilder
         Query.AppendLine("SELECT DISTINCT ")
         Query.AppendLine("UPPER(LEFT(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME, 1)) + LOWER(SUBSTRING(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME, 2, LEN(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME))) AS EntityClassName, ")
@@ -211,7 +211,7 @@ Public Class DA
 
         Return Query.ToString
     End Function
-    Private Function camelBack(stringToConvert As String) As String
+    Private Function CamelBack(stringToConvert As String) As String
         Dim output As String = ""
         Dim shouldCap As Boolean = True
 
@@ -234,11 +234,11 @@ Public Class DA
     End Sub
     Public Sub ProcessXsl(DbTable As String, Folder As String)
         Dim DataSchema As DataSet
-        DataSchema = getTableSchemaDataset(DbTable)
+        DataSchema = GetTableSchemaDataset(DbTable)
         ConvertDataType(DataSchema.Tables(0))
         Dim TempPath As String = System.IO.Path.GetTempFileName.Replace(".tmp", ".xml")
         DataSchema.WriteXml(TempPath, XmlWriteMode.IgnoreSchema)
-        DbTable = camelBack(DbTable)
+        DbTable = CamelBack(DbTable)
         Dim xslt As New XslCompiledTransform()
         'Process Base Template Files
         For Each baseDir As String In Directory.GetDirectories($"{Folder}\Base")
@@ -268,7 +268,7 @@ Public Class DA
                     cpy = False
                     xslt.Load(xfile)
                 End If
-                Dim fileout = xfile.Replace(tableDir, "").Replace(".xsl", "").Replace("Table", camelBack(DbTable))
+                Dim fileout = xfile.Replace(tableDir, "").Replace(".xsl", "").Replace("Table", CamelBack(DbTable))
                 Dim folderOut = OutputFolder + tableDir.Replace($"{Folder}\Table", "")
                 If Not IO.Directory.Exists($"{folderOut}\{DbTable}") Then
                     Directory.CreateDirectory($"{folderOut}\{DbTable}")

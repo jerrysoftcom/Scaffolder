@@ -38,9 +38,12 @@
     <xsl:text disable-output-escaping="yes"><![CDATA[using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using ]]></xsl:text>
     <xsl:value-of select="AppName"/>
@@ -53,6 +56,8 @@ namespace ]]></xsl:text>
     <xsl:value-of select="AppName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[.Controllers
 {
+    //[Authorize(Roles = AppBase.RoleAdmin)]
+    [Authorize]
     public class ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Controller : Controller
@@ -60,7 +65,7 @@ namespace ]]></xsl:text>
         private readonly ]]></xsl:text>
     <xsl:value-of select="ContextName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Context _context;
-       private readonly ]]></xsl:text>
+        private readonly ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Business _business;
 
@@ -81,13 +86,17 @@ namespace ]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[
         public async Task<IActionResult> Index()
         {
+            int pg = Convert.ToInt32(CookieRead("]]></xsl:text>
+        <xsl:value-of select="EntityClassName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[Page") ?? "1");
             ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Pager pgr = new ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Pager
             {
-                ObjList = await _business.ListAsync()
+                ObjList = await _business.ListAsync(),
+                PageNumber = pg
             };
 
             return View(pgr);
@@ -98,6 +107,9 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Pager pgr)
         {
+            CookieWrite("]]></xsl:text>
+        <xsl:value-of select="EntityClassName"/>
+        <xsl:text disable-output-escaping="yes"><![CDATA[Page", pgr.PageNumber.ToString(), 10);
             pgr.ObjList = await _business.ListAsync();
             return View(pgr);
         }
@@ -107,7 +119,12 @@ namespace ]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[/Details/5
         public async Task<IActionResult> Details(]]></xsl:text>
     <xsl:copy-of select="$keydatatype" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[? id)
+    <xsl:choose>
+      <xsl:when test="$keydatatype = 'int'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[?]]></xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text disable-output-escaping="yes"><![CDATA[ id)
         {
             if (id == null)
             {
@@ -131,7 +148,7 @@ namespace ]]></xsl:text>
         public IActionResult Line(int id)
         {
             BuildSelectData(null);
-            ViewData["detail]]></xsl:text>
+            ViewData["]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[Recnum"] = id;
             return View(new ]]></xsl:text>
@@ -145,7 +162,9 @@ namespace ]]></xsl:text>
         public IActionResult Create()
         {
             BuildSelectData(null);
-            return View();
+            return View(new ]]></xsl:text>
+            <xsl:value-of select="EntityClassName"/>
+            <xsl:text disable-output-escaping="yes"><![CDATA[());
         }
 
         // POST: ]]></xsl:text>
@@ -174,7 +193,12 @@ namespace ]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[/Edit/5
         public async Task<IActionResult> Edit(]]></xsl:text>
     <xsl:copy-of select="$keydatatype" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[? id)
+    <xsl:choose>
+      <xsl:when test="$keydatatype = 'int'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[?]]></xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text disable-output-escaping="yes"><![CDATA[ id)
         {
             if (id == null)
             {
@@ -242,7 +266,12 @@ namespace ]]></xsl:text>
     <xsl:text disable-output-escaping="yes"><![CDATA[/Delete/5
         public async Task<IActionResult> Delete(]]></xsl:text>
     <xsl:copy-of select="$keydatatype" />
-    <xsl:text disable-output-escaping="yes"><![CDATA[? id)
+    <xsl:choose>
+      <xsl:when test="$keydatatype = 'int'">
+        <xsl:text disable-output-escaping="yes"><![CDATA[?]]></xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text disable-output-escaping="yes"><![CDATA[ id)
         {
             if (id == null)
             {
@@ -279,45 +308,45 @@ namespace ]]></xsl:text>
     <xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[ record)
         {
-            string SelectText = GlobalVariables.SelectString;
-
-            if (record == null)
+            foreach(var rec in _business.BuildSelectData(record))
             {
-                record = new ]]></xsl:text>
-    <xsl:value-of select="EntityClassName"/>
-    <xsl:text disable-output-escaping="yes"><![CDATA[();
-            }]]></xsl:text>
-    <xsl:for-each select="ChildData">
-      <xsl:sort select="OrdinalPosition" data-type="number"/>
-      <xsl:choose>
-        <xsl:when test="IsFKey = 1">
-          <xsl:text disable-output-escaping="yes"><![CDATA[
+                ViewData.Add(rec);
+            }
+]]></xsl:text>
+            <xsl:for-each select="FKeys">
+              <xsl:sort select="OrdinalPosition" data-type="number"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[
+            foreach (var rec in (new ]]></xsl:text>
+                  <xsl:value-of select="FKeyEntityName"/>
+                  <xsl:text disable-output-escaping="yes"><![CDATA[Business(_context)).BuildSelectData(null))
+            {
+                if (!ViewData.ContainsKey(rec.Key))
+                {
+                    ViewData.Add(rec);
+                }
+            }
+]]></xsl:text>
+            </xsl:for-each>
+            <xsl:text disable-output-escaping="yes"><![CDATA[
+        }
 
-            var ]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[ = new SelectList(_context.]]></xsl:text>
-          <xsl:value-of select="ReferenceTableName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[, "]]></xsl:text>
-          <xsl:value-of select="ReferenceColumnName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[", "]]></xsl:text>
-          <xsl:value-of select="ReferenceColumnName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[", record.]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[).ToList();
-            ]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[.Insert(0, new SelectListItem { Value = "", Text = SelectText });
-            ViewData["]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA["] = ]]></xsl:text>
-          <xsl:value-of select="EntityPropertyName"/>
-          <xsl:text disable-output-escaping="yes"><![CDATA[;]]></xsl:text>
-        </xsl:when>
-        <xsl:otherwise>
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:for-each>
-    <xsl:text disable-output-escaping="yes"><![CDATA[
+        private void CookieWrite(string Key, string Value, int? ExpiresIn)
+        {
+            CookieOptions options = new CookieOptions();
+            if (ExpiresIn.HasValue)
+            {
+                options.Expires = DateTime.Now.AddMinutes(ExpiresIn.Value);
+            }
+            else
+            {
+                options.Expires = DateTime.Now.AddMilliseconds(10);
+            }
+            HttpContext.Response.Cookies.Append(Key, Value, options);
+        }
+
+        private string CookieRead(string Key) 
+        {
+            return HttpContext.Request.Cookies[Key];
         }
     }
 }]]></xsl:text>

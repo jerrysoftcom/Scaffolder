@@ -48,7 +48,7 @@ Public Class DBViewer
             Dim dt As New Data.DataTable
             Dim da As DA = GetDa()
 
-            dt = da.getTables
+            dt = da.GetTables
             Dim refreshCnt As Integer = 0
             Dim dr As DataRow
             For Each dr In dt.Rows
@@ -65,7 +65,7 @@ Public Class DBViewer
     End Sub
     Private Sub TvSchema_AfterSelect(ByVal sender As System.Object, ByVal e As System.Windows.Forms.TreeViewEventArgs) Handles tvSchema.AfterSelect
         Dim da As DA = GetDa()
-        Dim ddt As DataTable = da.getTableSchema(tvSchema.SelectedNode.Text)
+        Dim ddt As DataTable = da.GetTableSchema(tvSchema.SelectedNode.Text)
 
         dgvColumns.DataSource = ddt
 
@@ -112,7 +112,7 @@ Public Class DBViewer
                     Dim da As DA = GetDa()
                     Dim unused As New DataSet()
 
-                    Dim ds As DataSet = da.getTableSchemaDataset(nd.Text)
+                    Dim ds As DataSet = da.GetTableSchemaDataset(nd.Text)
                     ds.WriteXml(fbdDALSave.SelectedPath + "\" + nd.Text + ".xml", XmlWriteMode.IgnoreSchema)
                     MsgBox("Complete", "Build")
                 End If
