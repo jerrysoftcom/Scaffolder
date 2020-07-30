@@ -194,6 +194,9 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="packages.config" />
+    <None Include="Templates\Base\appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Templates\Base\Views\Login\AccessDenied.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -206,24 +209,39 @@
     <None Include="Templates\Base\Views\Login\Logout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\Base\Views\Login\PasswordRecovery.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="Templates\Base\Views\Login\PasswordReset.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Templates\Base\Views\Shared\Error.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Templates\Base\Views\Shared\RefreshPartial.cshtml" />
+    <None Include="Templates\Base\Views\Shared\_CookieConsentPartial.cshtml" />
     <None Include="Templates\Base\Views\Shared\_Layout.cshtml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Templates\Base\Views\Shared\_Menu.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Templates\Base\Views\Shared\_MenuTest.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="Templates\Base\Views\Shared\_ValidationScriptsPartial.cshtml" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-brands-400.eot" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-brands-400.ttf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-brands-400.woff" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-brands-400.woff2" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-regular-400.eot" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-regular-400.ttf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-regular-400.woff" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-regular-400.woff2" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-solid-900.eot" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-solid-900.ttf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-solid-900.woff" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fa-solid-900.woff2" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fontawesome-webfont.eot" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fontawesome-webfont.ttf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fontawesome-webfont.woff" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\fontawesome-webfont.woff2" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\FontAwesome.otf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\Simple-Line-Icons.eot" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\Simple-Line-Icons.ttf" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\Simple-Line-Icons.woff" />
+    <None Include="Templates\Base\wwwroot\assets\fonts\Simple-Line-Icons.woff2" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
@@ -256,11 +274,46 @@
     <Content Include="Templates\Base\Controllers\LoginController.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Templates\Base\wwwroot\css\Highlight-Blue.css" />
-    <Content Include="Templates\Base\wwwroot\css\Login-Form-Clean.css" />
-    <Content Include="Templates\Base\wwwroot\css\Navigation-with-Button.css" />
-    <Content Include="Templates\Base\wwwroot\css\sidebar_style.css" />
-    <Content Include="Templates\Base\wwwroot\css\site.css" />
+    <Content Include="Templates\Base\Startup.cs.xsl">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\Views\Login\PasswordRecovery.cshtml.xsl" />
+    <Content Include="Templates\Base\Views\Shared\Pager.cshtml.xsl" />
+    <Content Include="Templates\Base\Views\Shared\_MainMenu.cshtml.xsl" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\fa-brands-400.svg" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\fa-regular-400.svg" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\fa-solid-900.svg" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\font-awesome.min.css" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\fontawesome-all.min.css" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\fontawesome-webfont.svg" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\simple-line-icons.min.css" />
+    <Content Include="Templates\Base\wwwroot\assets\fonts\Simple-Line-Icons.svg" />
+    <Content Include="Templates\Base\wwwroot\css\Highlight-Blue.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\wwwroot\css\Login-Form-Clean.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\wwwroot\css\Navigation-with-Button.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\wwwroot\css\sidebar_style.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\wwwroot\css\site.css">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Base\wwwroot\js\app.js" />
+    <Content Include="Templates\Base\wwwroot\js\Chart.bundle.js" />
+    <Content Include="Templates\Base\wwwroot\js\Chart.bundle.min.js" />
+    <Content Include="Templates\Base\wwwroot\js\Chart.js" />
+    <Content Include="Templates\Base\wwwroot\js\Chart.min.js" />
+    <Content Include="Templates\Base\wwwroot\js\jquery.mCustomScrollbar.concat.min.js" />
+    <Content Include="Templates\Base\wwwroot\js\popper.min.js" />
+    <Content Include="Templates\Base\wwwroot\js\sidebar.js" />
+    <Content Include="Templates\Base\wwwroot\js\signature_pad.umd.js" />
+    <Content Include="Templates\Base\wwwroot\js\site.js" />
+    <Content Include="Templates\Base\wwwroot\js\site_ajax.js" />
     <Content Include="Templates\Table\Code\TableBusiness.cs.xsl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>

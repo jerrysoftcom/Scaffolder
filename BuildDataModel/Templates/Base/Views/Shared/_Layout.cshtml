@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - UtilityBilling</title>
+    <title>@ViewData["Title"]</title>
 
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -28,7 +28,7 @@
         var pagePath = Context.Request.Path;
     }
     @pagePath
-    <partial name="_MenuTest" model="new MenuModelData { User = Context.User, PagePath = pagePath }" />
+    <partial name="_MainMenu" model="new MenuModelData { User = Context.User, PagePath = pagePath }" />
 
     <div id="content" style="padding:0 0 0 0;">
         <form method="post">
@@ -76,7 +76,7 @@
         <footer class="border-top footer text-muted">
             <div class="container">
                 &copy; 2019 -
-                UtilityBilling Version 0.1  -  On <span id="currentOS"></span> - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                BuildDataModel FVM Version 0.1  -  On <span id="currentOS"></span> - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                 <script>
                     function getMobileOperatingSystem() {
                         var userAgent = navigator.userAgent || navigator.vendor || window.opera;

@@ -1,4 +1,7 @@
-﻿@model JS.Code.PasswordResetData
+﻿<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:strip-space elements="*"/>
+<xsl:output omit-xml-declaration="yes" indent="no" encoding="UTF-8" method="xml"/>
+<xsl:template match="ParentData"><xsl:text disable-output-escaping="yes"><![CDATA[@model ]]></xsl:text><xsl:value-of select="AppName"/><xsl:text disable-output-escaping="yes"><![CDATA[.Code.PasswordResetData
 
 <div class="col-md-6 offset-md-3">
     <span class="anchor" id="formResetPassword"></span>
@@ -40,4 +43,6 @@
             </form>
         </div>
     </div>
-</div>
+</div>]]></xsl:text>
+</xsl:template>
+</xsl:stylesheet>

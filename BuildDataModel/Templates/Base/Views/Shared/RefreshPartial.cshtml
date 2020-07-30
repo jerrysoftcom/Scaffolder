@@ -1,0 +1,8 @@
+﻿@model string
+@{ 
+    Layout = null;
+}
+<script>
+    window.opener.document.getElementById('@Model').click();
+    window.close();
+</script>

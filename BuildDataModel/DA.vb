@@ -32,8 +32,10 @@ Public Class DA
         Dim dtPar As DataTable = MakeParentDatatable(AppName, CapText(tableName), Database)
         dtPar.TableName = "ParentData"
         ds.Tables.Add(dtPar)
-
-        Dim fkText = "select EntityClassName, UPPER(LEFT(FKeyEntityName,1))+LOWER(SUBSTRING(FKeyEntityName,2,LEN(FKeyEntityName))) AS FKeyEntityName from ("
+        'FKeyEntityName
+        'Dim fkText = "select EntityClassName, UPPER(LEFT(FKeyEntityName,1))+LOWER(SUBSTRING(FKeyEntityName,2,LEN(FKeyEntityName))) AS FKeyEntityName from ("
+        Dim fkText = "select EntityClassName, UPPER(LEFT(FKeyEntityName,1))+(SUBSTRING(FKeyEntityName,2,LEN(FKeyEntityName))) AS FKeyEntityName from ("
+        'Dim fkText = "select EntityClassName, FKeyEntityName from ("
         Dim FKquery = fkText + query.Replace("DISTINCT", "DISTINCT KEYTABLE.TableName As FKeyEntityName, ") + ") As FKeysTable where FKeyEntityName is not null"
         Dim dtFKeys As DataTable = GetData(FKquery).Tables(0).Copy
         dtFKeys.TableName = "FKeys"
@@ -175,6 +177,61 @@ Public Class DA
     Private Function QueryForTableStructureNoFkeys() As String
         Dim Query As New StringBuilder
         Query.AppendLine("SELECT DISTINCT ")
+        Query.AppendLine("UPPER(LEFT(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME,1))+(SUBSTRING(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME,2,LEN(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME))) AS EntityClassName, ")
+        'Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.TABLE_NAME AS EntityClassName, ")
+        Query.AppendLine("LOWER(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME) AS EntityClassLower, ")
+        Query.AppendLine("UPPER(LEFT(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME,1))+(SUBSTRING(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME,2,LEN(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME))) AS EntityPropertyName, ")
+        'Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME AS EntityPropertyName, ")
+        Query.AppendLine("LOWER(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME) AS EntityPropertyLower, ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.ORDINAL_POSITION AS OrdinalPosition, ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.COLUMN_DEFAULT AS ColumnDefault, ")
+        Query.AppendLine("CASE WHEN INFORMATION_SCHEMA.COLUMNS.IS_NULLABLE = 'YES' THEN 1 ELSE 0 END AS AllowNull, ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.DATA_TYPE AS DataType, ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.CHARACTER_MAXIMUM_LENGTH AS ColumnSize, ")
+        Query.AppendLine("CASE WHEN IsKeyCol.COLUMN_NAME IS NULL THEN 0 ELSE 1 END AS IsKey, ")
+        Query.AppendLine("CASE WHEN FKEYTABLE.ReferenceColumnName IS NULL THEN 0 ELSE 1 END AS IsFKey, ")
+        Query.AppendLine("CASE WHEN KEYTABLE.ReferenceColumnName IS NULL THEN 0 ELSE 1 END AS HasFKey,")
+        Query.AppendLine("UPPER(LEFT(FKEYTABLE.ReferenceColumnName,1))+(SUBSTRING(FKEYTABLE.ReferenceColumnName,2,LEN(FKEYTABLE.ReferenceColumnName))) AS ReferenceColumnName, ")
+        Query.AppendLine("UPPER(LEFT(FKEYTABLE.ReferenceTableName,1))+(SUBSTRING(FKEYTABLE.ReferenceTableName,2,LEN(FKEYTABLE.ReferenceTableName))) AS ReferenceTableName ")
+        'Query.AppendLine("FKEYTABLE.ReferenceColumnName AS ReferenceColumnName,")
+        'Query.AppendLine("FKEYTABLE.ReferenceTableName AS ReferenceTableName")
+        Query.AppendLine("FROM INFORMATION_SCHEMA.TABLES INNER JOIN")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS ON INFORMATION_SCHEMA.TABLES.TABLE_NAME = INFORMATION_SCHEMA.COLUMNS.TABLE_NAME AND ")
+        Query.AppendLine("INFORMATION_SCHEMA.TABLES.TABLE_CATALOG = INFORMATION_SCHEMA.COLUMNS.TABLE_CATALOG AND ")
+        Query.AppendLine("INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA = INFORMATION_SCHEMA.COLUMNS.TABLE_SCHEMA LEFT OUTER JOIN")
+        Query.AppendLine("(SELECT OBJECT_NAME(f.parent_object_id) AS TableName, ")
+        Query.AppendLine("COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, ")
+        Query.AppendLine("OBJECT_NAME(f.referenced_object_id) AS ReferenceTableName, ")
+        Query.AppendLine("COL_NAME(fc.referenced_object_id, fc.referenced_column_id) AS ReferenceColumnName, ")
+        Query.AppendLine("f.name AS ForeignKey")
+        Query.AppendLine("FROM sys.foreign_keys AS f INNER JOIN")
+        Query.AppendLine("sys.foreign_key_columns AS fc ON f.object_id = fc.constraint_object_id INNER JOIN")
+        Query.AppendLine("sys.objects AS o ON o.object_id = fc.referenced_object_id) AS KEYTABLE ON INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = KEYTABLE.ReferenceTableName AND ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = KEYTABLE.ReferenceColumnName LEFT OUTER JOIN")
+        Query.AppendLine("(SELECT OBJECT_NAME(f.parent_object_id) AS TableName, ")
+        Query.AppendLine("COL_NAME(fc.parent_object_id, fc.parent_column_id) AS ColumnName, ")
+        Query.AppendLine("OBJECT_NAME(f.referenced_object_id) AS ReferenceTableName, ")
+        Query.AppendLine("COL_NAME(fc.referenced_object_id, ")
+        Query.AppendLine("fc.referenced_column_id) AS ReferenceColumnName, ")
+        Query.AppendLine("f.name AS ForeignKey")
+        Query.AppendLine("FROM sys.foreign_keys AS f INNER JOIN")
+        Query.AppendLine("sys.foreign_key_columns AS fc ON f.object_id = fc.constraint_object_id INNER JOIN")
+        Query.AppendLine("sys.objects AS o ON o.object_id = fc.referenced_object_id) AS FKEYTABLE ON INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = FKEYTABLE.TableName AND ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = FKEYTABLE.ColumnName LEFT OUTER JOIN")
+        Query.AppendLine("(SELECT i1.TABLE_NAME, i2.COLUMN_NAME")
+        Query.AppendLine("FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS i1 INNER JOIN")
+        Query.AppendLine("INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME")
+        Query.AppendLine("WHERE (i1.CONSTRAINT_TYPE = 'PRIMARY KEY')) AS IsKeyCol ON INFORMATION_SCHEMA.COLUMNS.TABLE_NAME = IsKeyCol.TABLE_NAME AND ")
+        Query.AppendLine("INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME = IsKeyCol.COLUMN_NAME")
+        Query.AppendLine("WHERE (INFORMATION_SCHEMA.COLUMNS.DATA_TYPE IN ('bigint', 'binary', 'bit', 'char', 'date', 'datetime', 'datetime2', ")
+        Query.AppendLine("'datetimeoffset', 'decimal', 'float', 'image', 'int', 'money', 'nchar', 'ntext', 'numeric', 'nvarchar', 'real', ")
+        Query.AppendLine("'smalldatetime', 'smallint', 'smallmoney', 'text', 'time', 'timestamp', 'tinyint', 'varbinary', 'varchar'))")
+
+        Return Query.ToString
+    End Function
+    Private Function QueryForTableStructureNoFkeys2() As String
+        Dim Query As New StringBuilder
+        Query.AppendLine("SELECT DISTINCT ")
         Query.AppendLine("UPPER(LEFT(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME, 1)) + LOWER(SUBSTRING(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME, 2, LEN(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME))) AS EntityClassName, ")
         Query.AppendLine("LOWER(INFORMATION_SCHEMA.COLUMNS.TABLE_NAME) AS EntityClassLower, UPPER(LEFT(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME, 1)) ")
         Query.AppendLine("+ LOWER(SUBSTRING(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME, 2, LEN(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME))) AS EntityPropertyName, LOWER(INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME) ")
@@ -215,16 +272,22 @@ Public Class DA
         Dim output As String = ""
         Dim shouldCap As Boolean = True
 
-        For Each s As String In stringToConvert.ToLower
-            If shouldCap Then
-                output += s.ToUpper
-                shouldCap = False
-            Else
-                output += s
-            End If
-            If s = "_" Then shouldCap = True
-        Next
-        Return output.Replace("_", "")
+        If stringToConvert.Contains("_") Or stringToConvert = stringToConvert.ToLower Then
+            For Each s As String In stringToConvert.ToLower
+                If shouldCap Then
+                    output += s.ToUpper
+                    shouldCap = False
+                Else
+                    output += s
+                End If
+                If s = "_" Then shouldCap = True
+            Next
+            output = output.Replace("_", "")
+        Else
+            output = stringToConvert
+        End If
+
+        Return output
     End Function
 
     Public Sub ProcessXsl(DbTable As String)
@@ -233,36 +296,43 @@ Public Class DA
         ProcessXsl(DbTable, Folder)
     End Sub
     Public Sub ProcessXsl(DbTable As String, Folder As String)
+        Application.DoEvents()
         Dim DataSchema As DataSet
         DataSchema = GetTableSchemaDataset(DbTable)
         ConvertDataType(DataSchema.Tables(0))
-        Dim TempPath As String = System.IO.Path.GetTempFileName.Replace(".tmp", ".xml")
+        Dim TempPath As String = System.IO.Path.GetTempFileName
+        File.Delete(TempPath)
+        TempPath = TempPath.Replace(".tmp", ".xml")
         DataSchema.WriteXml(TempPath, XmlWriteMode.IgnoreSchema)
         DbTable = CamelBack(DbTable)
         Dim xslt As New XslCompiledTransform()
         'Process Base Template Files
-        For Each baseDir As String In Directory.GetDirectories($"{Folder}\Base")
-            For Each xfile As String In Directory.GetFiles(baseDir)
-                Dim cpy As Boolean = True
-                If xfile.Contains(".xsl") Then
-                    cpy = False
-                    xslt.Load(xfile)
-                End If
-                Dim fileout = xfile.Replace(baseDir, "").Replace(".xsl", "")
-                Dim folderOut = OutputFolder + baseDir.Replace($"{Folder}\Base", "")
+        ProcessFiles($"{Folder}\Base", Folder, TempPath)
 
-                If Not IO.Directory.Exists($"{folderOut}\{DbTable}") Then
-                    Directory.CreateDirectory($"{folderOut}\{DbTable}")
-                End If
-                If Not cpy Then
-                    xslt.Transform(TempPath, $"{folderOut}\{fileout}")
-                Else
-                    IO.File.Copy(xfile, $"{folderOut}\{DbTable}\{fileout}")
-                End If
-            Next
-        Next
+        'For Each baseDir As String In Directory.GetDirectories($"{Folder}\Base")
+        '    For Each xfile As String In Directory.GetFiles(baseDir)
+        '        Application.DoEvents()
+        '        Dim cpy As Boolean = True
+        '        If xfile.Contains(".xsl") Then
+        '            cpy = False
+        '            xslt.Load(xfile)
+        '        End If
+        '        Dim fileout = xfile.Replace(baseDir, "").Replace(".xsl", "")
+        '        Dim folderOut = OutputFolder + baseDir.Replace($"{Folder}\Base", "")
+
+        '        If Not IO.Directory.Exists($"{folderOut}\{DbTable}") Then
+        '            Directory.CreateDirectory($"{folderOut}\{DbTable}")
+        '        End If
+        '        If Not cpy Then
+        '            xslt.Transform(TempPath, $"{folderOut}\{fileout}")
+        '        Else
+        '            IO.File.Copy(xfile, $"{folderOut}\{DbTable}\{fileout}")
+        '        End If
+        '    Next
+        'Next
         For Each tableDir As String In Directory.GetDirectories($"{Folder}\Table")
             For Each xfile As String In Directory.GetFiles(tableDir)
+                Application.DoEvents()
                 Dim cpy As Boolean = True
                 If xfile.Contains(".xsl") Then
                     cpy = False
@@ -283,4 +353,34 @@ Public Class DA
         System.IO.File.Delete(TempPath)
     End Sub
 
+    Private Sub ProcessFolder(FolderName As String, Folder As String, TempPath As String)
+
+    End Sub
+    Private Sub ProcessFiles(FolderName As String, Folder As String, TempPath As String)
+        Dim xslt As New XslCompiledTransform()
+        For Each xfile As String In Directory.GetFiles(FolderName)
+            Application.DoEvents()
+            Dim cpy As Boolean = True
+            If xfile.Contains(".xsl") Then
+                cpy = False
+                xslt.Load(xfile)
+            End If
+            Dim fileout = xfile.Replace(FolderName, "").Replace(".xsl", "")
+            Dim folderOut = OutputFolder + FolderName.Replace($"{Folder}\Base", "")
+
+            If Not IO.Directory.Exists($"{folderOut}") Then
+                Directory.CreateDirectory($"{folderOut}")
+            End If
+            If Not cpy Then
+                xslt.Transform(TempPath, $"{folderOut}\{fileout}")
+            Else
+                IO.File.Copy(xfile, $"{folderOut}\{fileout}", True)
+            End If
+        Next
+        If Directory.GetDirectories(FolderName).Any Then
+            For Each xfolder As String In Directory.GetDirectories(FolderName)
+                ProcessFiles(xfolder, Folder, TempPath)
+            Next
+        End If
+    End Sub
 End Class

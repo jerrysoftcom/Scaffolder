@@ -4,8 +4,8 @@
   <xsl:template match="ParentData">
     @model <xsl:value-of select="AppName"/>.Models.<xsl:value-of select="EntityClassName"/>
     <xsl:text disable-output-escaping="yes"><![CDATA[
-            <div class="table-responsive borderless">
-              <table class="table-responsive borderless">]]></xsl:text>
+            <div class="table-responsive-md borderless">
+              <table class="table-responsive-md borderless">]]></xsl:text>
     <xsl:apply-templates select="ChildData[IsKey=0]">
       <xsl:sort select="OrdinalPosition" data-type="number"/>
     </xsl:apply-templates>
